@@ -144,26 +144,7 @@ func (h *LedgerHandler) GetTrialBalance(c *gin.Context) {
 		return
 	}
 
-	// Calculate totals
-	var totalDebit, totalCredit, totalDebitBalance, totalCreditBalance float64
-	for _, item := range trialBalance {
-		totalDebit += item.Debit
-		totalCredit += item.Credit
-		totalDebitBalance += item.DebitBalance
-		totalCreditBalance += item.CreditBalance
-	}
-
-	response := map[string]interface{}{
-		"end_date":             endDateStr,
-		"accounts":             trialBalance,
-		"total_debit":          totalDebit,
-		"total_credit":         totalCredit,
-		"total_debit_balance":  totalDebitBalance,
-		"total_credit_balance": totalCreditBalance,
-		"is_balanced":          totalDebitBalance == totalCreditBalance,
-	}
-
-	utils.SuccessResponse(c, http.StatusOK, "Trial balance retrieved successfully", response)
+	utils.SuccessResponse(c, http.StatusOK, "Trial balance retrieved successfully", trialBalance)
 }
 
 func (h *LedgerHandler) GetAccountBalance(c *gin.Context) {

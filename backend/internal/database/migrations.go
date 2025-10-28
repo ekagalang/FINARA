@@ -13,10 +13,21 @@ func RunMigrations(db *gorm.DB) error {
 	err := db.AutoMigrate(
 		&models.User{},
 		&models.Company{},
-		&models.Account{},        // NEW
-		&models.Journal{},        // NEW
-		&models.JournalEntry{},   // NEW
-		&models.Ledger{},         // NEW
+		&models.Account{},
+		&models.Journal{},
+		&models.JournalEntry{},
+		&models.Ledger{},
+		&models.CashBankTransaction{},
+		&models.BankReconciliation{},
+		&models.Tax{},
+		&models.Notification{},
+		&models.Product{},
+		&models.StockMovement{},
+		&models.StockBalance{},
+		&models.StockOpname{},
+		&models.StockOpnameItem{},
+		&models.AuditLog{},
+		&models.Backup{},
 	)
 
 	if err != nil {

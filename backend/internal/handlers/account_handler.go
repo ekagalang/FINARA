@@ -100,6 +100,24 @@ func (h *AccountHandler) GetAccountByID(c *gin.Context) {
 	utils.SuccessResponse(c, http.StatusOK, "Account retrieved successfully", account)
 }
 
+func (h *AccountHandler) GetAccountByCode(c *gin.Context) {
+	companyID, _ := c.Get("company_id")
+	code := c.Param("code")
+
+	if code == "" {
+		utils.ErrorResponse(c, http.StatusBadRequest, "Account code is required", nil)
+		return
+	}
+
+	account, err := h.accountService.GetAccountByCode(companyID.(uint), code)
+	if err != nil {
+		utils.ErrorResponse(c, http.StatusNotFound, "Account not found", err)
+		return
+	}
+
+	utils.SuccessResponse(c, http.StatusOK, "Account retrieved successfully", account)
+}
+
 func (h *AccountHandler) UpdateAccount(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {

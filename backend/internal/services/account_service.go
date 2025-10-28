@@ -9,6 +9,7 @@ import (
 type AccountService interface {
 	CreateAccount(account *models.Account) error
 	GetAccountByID(id uint) (*models.Account, error)
+	GetAccountByCode(companyID uint, code string) (*models.Account, error)
 	GetAccountsByCompanyID(companyID uint) ([]models.Account, error)
 	GetAccountsByType(companyID uint, accountType models.AccountType) ([]models.Account, error)
 	GetActiveAccounts(companyID uint) ([]models.Account, error)
@@ -42,6 +43,10 @@ func (s *accountService) CreateAccount(account *models.Account) error {
 
 func (s *accountService) GetAccountByID(id uint) (*models.Account, error) {
 	return s.accountRepo.FindByID(id)
+}
+
+func (s *accountService) GetAccountByCode(companyID uint, code string) (*models.Account, error) {
+	return s.accountRepo.FindByCode(companyID, code)
 }
 
 func (s *accountService) GetAccountsByCompanyID(companyID uint) ([]models.Account, error) {

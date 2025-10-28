@@ -39,3 +39,14 @@ type TrialBalanceResponse struct {
 	DebitBalance  float64 `json:"debit_balance"`
 	CreditBalance float64 `json:"credit_balance"`
 }
+
+type TrialBalanceReport struct {
+	Period             string                  `json:"period"`
+	AsOfDate           string                  `json:"as_of_date"`
+	Accounts           []TrialBalanceResponse  `json:"accounts"`
+	TotalDebit         float64                 `json:"total_debit"`
+	TotalCredit        float64                 `json:"total_credit"`
+	TotalDebitBalance  float64                 `json:"total_debit_balance"`
+	TotalCreditBalance float64                 `json:"total_credit_balance"`
+	IsBalanced         bool                    `json:"is_balanced"`
+}
