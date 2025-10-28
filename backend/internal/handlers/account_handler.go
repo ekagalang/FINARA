@@ -19,6 +19,7 @@ func NewAccountHandler(accountService services.AccountService) *AccountHandler {
 }
 
 type CreateAccountRequest struct {
+	CompanyID   *uint                   `json:"company_id"` // Optional, can be provided if not in token
 	Code        string                  `json:"code" binding:"required"`
 	Name        string                  `json:"name" binding:"required"`
 	Type        models.AccountType      `json:"type" binding:"required"`
@@ -36,10 +37,25 @@ func (h *AccountHandler) CreateAccount(c *gin.Context) {
 		return
 	}
 
-	companyID, _ := c.Get("company_id")
+	// Get company_id from token
+	companyIDFromToken, _ := c.Get("company_id")
+
+	// Use company_id from request if provided and token has no company_id (0)
+	var companyID uint
+	if req.CompanyID != nil && *req.CompanyID > 0 {
+		companyID = *req.CompanyID
+	} else {
+		companyID = companyIDFromToken.(uint)
+	}
+
+	// Validate that we have a valid company_id
+	if companyID == 0 {
+		utils.ErrorResponse(c, http.StatusBadRequest, "Company ID is required", nil)
+		return
+	}
 
 	account := &models.Account{
-		CompanyID:   companyID.(uint),
+		CompanyID:   companyID,
 		Code:        req.Code,
 		Name:        req.Name,
 		Type:        req.Type,

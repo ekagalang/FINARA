@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(go run:*)"
+      "Bash(go run:*)",
+      "Bash(go test -v)",
+      "Bash(go test -v -run TestCreateAccount)",
+      "Bash(go test -v -run TestHealthEndpoint)"
     ],
     "deny": [],
     "ask": []

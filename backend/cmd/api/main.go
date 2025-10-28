@@ -8,6 +8,7 @@ import (
 	"finara-backend/internal/repository"
 	"finara-backend/internal/services"
 	"log"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -43,9 +44,9 @@ func main() {
 	taxRepo := repository.NewTaxRepository(db)
 	dashboardRepo := repository.NewDashboardRepository(db)
 	notificationRepo := repository.NewNotificationRepository(db)
-	inventoryRepo := repository.NewInventoryRepository(db)          // NEW - FASE 5
-	auditLogRepo := repository.NewAuditLogRepository(db)            // NEW - FASE 5
-	backupRepo := repository.NewBackupRepository(db)                // NEW - FASE 5
+	inventoryRepo := repository.NewInventoryRepository(db)
+	auditLogRepo := repository.NewAuditLogRepository(db)
+	backupRepo := repository.NewBackupRepository(db)
 
 	// Database config for backup service
 	dbConfig := &services.DatabaseConfig{
@@ -68,10 +69,10 @@ func main() {
 	taxService := services.NewTaxService(taxRepo)
 	dashboardService := services.NewDashboardService(dashboardRepo)
 	notificationService := services.NewNotificationService(notificationRepo, taxRepo, userRepo)
-	inventoryService := services.NewInventoryService(inventoryRepo, journalRepo, accountRepo)  // NEW - FASE 5
-	auditLogService := services.NewAuditLogService(auditLogRepo)                               // NEW - FASE 5
-	exportService := services.NewExportService()                                               // NEW - FASE 5
-	backupService := services.NewBackupService(backupRepo, dbConfig)                           // NEW - FASE 5
+	inventoryService := services.NewInventoryService(inventoryRepo, journalRepo, accountRepo)
+	auditLogService := services.NewAuditLogService(auditLogRepo)
+	exportService := services.NewExportService()
+	backupService := services.NewBackupService(backupRepo, dbConfig)
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(authService)
@@ -85,10 +86,10 @@ func main() {
 	taxHandler := handlers.NewTaxHandler(taxService)
 	dashboardHandler := handlers.NewDashboardHandler(dashboardService)
 	notificationHandler := handlers.NewNotificationHandler(notificationService)
-	inventoryHandler := handlers.NewInventoryHandler(inventoryService)                                    // NEW - FASE 5
-	auditLogHandler := handlers.NewAuditLogHandler(auditLogService)                                       // NEW - FASE 5
-	exportHandler := handlers.NewExportHandler(exportService, journalService, ledgerService, reportService) // NEW - FASE 5
-	backupHandler := handlers.NewBackupHandler(backupService)                                             // NEW - FASE 5
+	inventoryHandler := handlers.NewInventoryHandler(inventoryService)
+	auditLogHandler := handlers.NewAuditLogHandler(auditLogService)
+	exportHandler := handlers.NewExportHandler(exportService, journalService, ledgerService, reportService)
+	backupHandler := handlers.NewBackupHandler(backupService)
 
 	// Setup Gin router
 	r := gin.Default()
@@ -96,6 +97,9 @@ func main() {
 	// Middleware
 	r.Use(middleware.CORS())
 	r.Use(middleware.Logger())
+	r.Use(middleware.RateLimitMiddleware())
+	r.Use(middleware.SecurityHeaders())
+	r.Use(middleware.TimeoutMiddleware(30 * time.Second))
 
 	// Health check
 	r.GET("/health", func(c *gin.Context) {
@@ -278,10 +282,10 @@ func main() {
 			// Export (NEW - FASE 5)
 			exports := protected.Group("/export")
 			{
-				exports.GET("/journals", exportHandler.ExportJournals)                   // ?format=csv/excel&start_date=&end_date=
-				exports.GET("/trial-balance", exportHandler.ExportTrialBalance)          // ?format=csv/excel&end_date=
-				exports.GET("/income-statement", exportHandler.ExportIncomeStatement)    // ?format=csv/excel&start_date=&end_date=
-				exports.GET("/balance-sheet", exportHandler.ExportBalanceSheet)          // ?format=csv/excel&as_of_date=
+				exports.GET("/journals", exportHandler.ExportJournals)                // ?format=csv/excel&start_date=&end_date=
+				exports.GET("/trial-balance", exportHandler.ExportTrialBalance)       // ?format=csv/excel&end_date=
+				exports.GET("/income-statement", exportHandler.ExportIncomeStatement) // ?format=csv/excel&start_date=&end_date=
+				exports.GET("/balance-sheet", exportHandler.ExportBalanceSheet)       // ?format=csv/excel&as_of_date=
 			}
 
 			// Backup & Restore (NEW - FASE 5)
